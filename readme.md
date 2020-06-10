@@ -113,7 +113,7 @@ Remember we need to set environment variables for two of the containers.
     - APP should be working as expected!!!
 
 
-4 Setting up Docker'desktop kubernetes dashboard
+5 Setting up Docker'desktop kubernetes dashboard
 -----------------------------------------------
 
 **Applies only for docker's desktop kubernetes version**
@@ -134,3 +134,16 @@ Remember we need to set environment variables for two of the containers.
     - You will be presented with a login screen
     - Click the "SKIP" link next to the SIGN IN button.
     - **if you are not entering click quickly on the + symbol and then you will be inside**
+
+
+6 Deploying to Production!!
+-----------------------------------------------
+
+So for production we are going to use Google cloud this time. Reasons to use Google cloud instead of AWS are: google created kubernetes (understand it at very low level), it is easier to poke around Kubernetes on Google cloud, excellent documentation.
+
+
+**DISCLOSURE: if you run this you will end up paying like 1.50$ per day so have that in mind, you can first go to the section and then make everything quick to avoid more charges**
+
+ These are the steps we are going to follow.
+
+![Image description](images/image6.png)
