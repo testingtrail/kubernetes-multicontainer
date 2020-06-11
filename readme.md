@@ -135,8 +135,12 @@ Remember we need to set environment variables for two of the containers.
     - Click the "SKIP" link next to the SIGN IN button.
     - **if you are not entering click quickly on the + symbol and then you will be inside**
 
+7. **CLEANING UP RESOURCES**
+    - IF USING MINIKUBE: enter minikube stop (if you want to start again minikube start)
+    - if using kubernetes for docker desktop: go to docker --> settings -> kubernetes -> reset kubernetes cluster or if you want to disable it uncheck enable kubernetes
 
-6 Deploying to Production!!
+
+6 Deploying to Production!! First Steps!!
 -----------------------------------------------
 
 So for production we are going to use Google cloud this time. Reasons to use Google cloud instead of AWS are: google created kubernetes (understand it at very low level), it is easier to poke around Kubernetes on Google cloud, excellent documentation.
@@ -147,3 +151,47 @@ So for production we are going to use Google cloud this time. Reasons to use Goo
  These are the steps we are going to follow.
 
 ![Image description](images/image6.png)
+
+1. Create github repository
+
+2. Link github to a travis repository (https://travis-ci.org/)
+    - Go to your travis account and in settings go to repository and select the repository created in previous step. (if you don't have travis account create one using your github login)
+
+3. create google cloud account (https://console.cloud.google.com/)
+    - You can create a free account but you have to add a payment method.
+    -  Go to the top menu and create new project, put something like 'multi-k8s'
+    - Go to menu -> compute -> kubernetes engine (it shows a message telling you 'Kubernetes Engine API is being enabled....')
+    - Once that is done click on 'create cluster' -> name(multi-cluster)
+        - node pools (choose 3 nodes) -> for machine you can leave 3.75 GB CPU
+        - Click on create
+    - **Remember if you need to clean up to avoid billing go to https://www.udemy.com/course/docker-and-kubernetes-the-complete-guide/learn/lecture/11684242?start=0#overview and see the steps**
+
+
+7 More on Travis configuration file
+-----------------------------------------------
+
+Travis will help not just to test but also deploy our application to google cloud, that means we will have many configuration in our travis.yml file, we are going to configure the following:
+
+![Image description](images/image7.png)
+
+1. We have to first install the Google Cloud SDK for Travis
+    - The 'bash > /dev/null;' command will install the first part (sdk url) in our little instance of TravisCi
+    - This command 'source $HOME/google-cloud-sdk/path.bash.inc' will take the .inc file and apply additional configurations, so the source command loads any functions file into the current shell script or a command prompt
+
+2. Generating a service account
+    - go to google cloud -> IAM & Admin -> Service Accounts -> Create service account -> put a name like 'travis-deployer' -> click create -> select 'kubernetes engine admin' as roled -> done
+    - Then once created in the service accounts dashboard check the service account created -> actions (on the right) -> create key -> JSON. **It will download a file which is the one we are going to upload to Travis CI CLI, DO NOT EXPOSE THAT FILE TO THE OUTSIDE WORLD**
+
+3. **Install Travis CI CLI**
+    - we are going to run it in a container to avoid install on our machines, because we need Ruby to be installed
+    - Run 'docker run -it -v $(pwd):/app ruby:2.4 sh' this will install the ruby 2.4 image, also will open a shell and also create a volume in the current directory (${pwd}) to map it to the /app folder in the container
+    - Run ls (we are inside the container), you will see the app folder, then go to that folder and run 'ls', you will see all the folders of this project (because we map it with the volume)
+    - Install Travis in that container: 'gem install travis --no-document'
+    - Run 'travis' enter N for shell auto completion as we don't need it for anything
+    - RUN 'travis login --org' to connect to our personal account (remember this is github credentials)
+    - Copy JSON file in our volumed folder so we can use it in the container (rename it to like 'service-account.json')
+    - go to the app folder so we can see te 'service-account.json' and run 'travis encrypt-file service-account.json -r testingtrail/kubernetes_multicontainer --org'. **Add the command that it will tells you to add in the travis.yml. 
+    - **DELETE THE ORIGINAL SERVICE-ACCOUNT.JSON**
+    - Exit from the container
+    - Commit changes
+    
