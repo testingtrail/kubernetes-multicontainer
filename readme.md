@@ -265,8 +265,25 @@ HELM is a program that allows us to administer third party programs inside our k
 ![Image description](images/image9.png)
 
 **Note: if you need to make a change in your app follow these steps**
+
     - Check out a branch: 'git checkout -b mynewbranch'
     - Make a change, for instance go to client->src->App.js and change the title to 'Fib Calculator!!!'
     - Run 'git status' to make sure you made the changes
     - Stage the changes: 'git add .'
-    - Commit changes 
+    - Commit changes 'git commit -m "changing head title"'
+    - Push: 'git push origin mynewbranch'
+    - Create a pull request on Github
+        - Go to 'pull request' tab -> new pull request -> select the new branch on the right dropdown so it looks something like: 'base:master <- compare:newbranch'
+        - Click on 'create pull request'
+        - Enter some comment -> 'create pull request'
+        - **wait on travis to run the test**
+
+![Image description](images/image10.png)
+
+    - Now both the push and the pr are done in travis you can just **merge** it. (you can choose if travis will run the test with each push or just with the PRs)
+        - Click on 'merge pull request' -> 'confirm merge'
+        - You can click on 'delete the branch' if you want
+        - Travis will run after the merge and then it will be deployed automatically in cloud!!
+    - Delete local branch
+
+**NOTE: if you want to see how to set up https in your site continue to section 17 on the course for Docker and Kubernetes: The Complete Guide from Stephen Grider. You will have to buy a domain!**
