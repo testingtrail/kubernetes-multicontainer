@@ -189,9 +189,67 @@ Travis will help not just to test but also deploy our application to google clou
     - Install Travis in that container: 'gem install travis --no-document'
     - Run 'travis' enter N for shell auto completion as we don't need it for anything
     - RUN 'travis login --org' to connect to our personal account (remember this is github credentials)
-    - Copy JSON file in our volumed folder so we can use it in the container (rename it to like 'service-account.json')
+    
+4. Copy JSON file in our volumed folder so we can use it in the container (rename it to like 'service-account.json')
     - go to the app folder so we can see te 'service-account.json' and run 'travis encrypt-file service-account.json -r testingtrail/kubernetes_multicontainer --org'. **Add the command that it will tells you to add in the travis.yml. 
     - **DELETE THE ORIGINAL SERVICE-ACCOUNT.JSON**
     - Exit from the container
     - Commit changes
-    
+
+5. Add the project we want to use in the google cloud
+    - 'gcloud config set project <projectID>' the name of the project is the ID of the project
+    - put your kubernetes location
+    - add the cluster
+
+6. Create docker password and docker username in Travis
+    - go to project in travis -> more options -> settings -> environment variables
+    - create DOCKER_USERNAME and DOCKER_PASSWORD and put the values your docker cli
+    - add the Dockerfile.dev we need to run to test the app
+    - The test is not needed,we added it for reference if you need to know how to set it for future projects
+
+7. Adding files for deployment
+    - Travis does not have commands directly to deploy to Kubernetes so we have to pass it the commands
+    - we are going to crete a sh file to build the images and then upload them to docker hub
+    - we can use docker and kubectl in the sh because they were both configured in the travis.yml already
+    - **we need to put tags so kubectl sees them and update the image, if not it will continue using the one it was using (latest is default tag, that is why)** so to make it automatically and have a different image each time we are going to use the GIT SHA (each commit has an unique SHA). We are going to store it here: 'SHA=$(git rev-parse HEAD)'
+
+
+8 More on Google Cloud configuration
+-------------------------------------
+
+1. First connect to your kubernetes cluster using google cloud terminal (you have to do this just once)
+    - go to the top of kubernetes dashboard and look for 'activate cloud shell'
+    - Run there this 'gcloud config set project <projectID>'
+    - Run 'gcloud config set compute/zone <the zone of your kubernetes project>'
+    - Run 'gcloud container clusters get-credentials cluster-1'
+
+2. We need to configure the value for the PG password to pass it to server-deployment object
+    - create the secret for PGpassword running this on that google cloud terminal 'kubectl create secret generic pgpassword --from-literal PGPASSWORD=<Whateverpassword>' 123passOK
+
+3. we have to create our ingress-nginx for google cloud, we have to install it as a separate service. We will have the ingress config and also will create the load balancer.
+    - we are going to use HELM
+    - Here's the diagram on how that ingress-nginx works
+
+    ![Image description](images/image8.png)
+
+
+9 Configuring HELM for our ingress service
+------------------------------------------
+
+HELM is a program that allows us to administer third party programs inside our kubernetes cluster. It is a package manager for Kubernetes (https://helm.sh/). Helm is a client and it relates it to Tiller (it is a POD created that make changes to the cluster) So Helm is more like a CLI and tiller the one who acts. There is something called RBAC (role based access control) on google cloud that limits who can access and modify objects in the cluster, so Tiller needs to get permissions for it. (creating a service account)
+
+1. Run the following commands in google cloud terminal
+    - 'curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 > get_helm.sh'
+    - 'chmod 700 get_helm.sh'
+    - './get_helm.sh'
+    - Run 'helm repo add stable https://kubernetes-charts.storage.googleapis.com/'
+    - Run 'helm install my-nginx stable/nginx-ingress --set rbac.create=true ' to install the nginx-ingress
+
+2. If you refresh the page and go to 'workloads' you will see the ingress controller (**the deployment that manages the POD that runs the actual controller that reads ingress config file and setup nginx**) and the default backend (have checks to healthy run). If you go to 'services and ingress' you will see the ip for the ingress controller, the default 404 page is created for the default backend. 
+
+10 FINALLY, DEPLOY ON PRODUCTION
+--------------------------------
+
+1. Commit and push to Github
+
+2. 
