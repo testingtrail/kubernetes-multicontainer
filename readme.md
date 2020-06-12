@@ -252,4 +252,21 @@ HELM is a program that allows us to administer third party programs inside our k
 
 1. Commit and push to Github
 
-2. 
+2. Go to travis and check the build running and you will see all the steps. At the end if there are no issues the built will success
+
+3. If you go to the cluster to the 'workloads' in the left meny you will see all the deployment in OK status.
+
+4. If you go to 'services & ingress' you will see all the cluster ip and the ingress service, all in OK status.
+
+5. If you go to storage you will see a persistent volume, the one that is created in 'database-persistent-volume-claim.yaml'
+
+6. NOW, go to your 'my-nginx-nginx-ingress-controller' and click on endpoints, it should load the app!!!
+
+![Image description](images/image9.png)
+
+**Note: if you need to make a change in your app follow these steps**
+    - Check out a branch: 'git checkout -b mynewbranch'
+    - Make a change, for instance go to client->src->App.js and change the title to 'Fib Calculator!!!'
+    - Run 'git status' to make sure you made the changes
+    - Stage the changes: 'git add .'
+    - Commit changes 
