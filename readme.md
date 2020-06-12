@@ -284,6 +284,7 @@ HELM is a program that allows us to administer third party programs inside our k
         - Click on 'merge pull request' -> 'confirm merge'
         - You can click on 'delete the branch' if you want
         - Travis will run after the merge and then it will be deployed automatically in cloud!!
-    - Delete local branch
+    - move to master: 'git checkout master'
+    - Delete local branch 'git branch -D mynewbranch'
 
 **NOTE: if you want to see how to set up https in your site continue to section 17 on the course for Docker and Kubernetes: The Complete Guide from Stephen Grider. You will have to buy a domain!**
